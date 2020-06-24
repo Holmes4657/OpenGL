@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <SDL.h>
-#include "sturcts.h"
+#include "structs.h"
 #include <stdbool.h>
 #include "shader.h"
 #include "texture.h"
@@ -119,6 +119,20 @@ int main(int argc, char* argv[]) {
 		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 	};
 
+	//Cube position
+	vec3 cubePosition[] = {
+		{0.0f,  0.0f,  0.0f},
+		{2.0f,  5.0f, -15.0f},
+		{-1.5f, -2.2f, -2.5f},
+		{-3.8f, -2.0f, -12.3f},
+		{2.4f, -0.4f, -3.5f},
+		{-1.7f,  3.0f, -7.5f},
+		{1.3f, -2.0f, -2.5f},
+		{1.5f,  2.0f, -2.5f},
+		{1.5f,  0.2f, -1.5f},
+		{-1.3f,  1.0f, -1.5f}
+	};
+
 	unsigned int VBO, VAO;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
@@ -160,24 +174,26 @@ int main(int argc, char* argv[]) {
 
 		glUseProgram(shaderProgram);
 
-		mat4 model = GLM_MAT4_IDENTITY_INIT;
+		
 		mat4 view = GLM_MAT4_IDENTITY_INIT;
 		mat4 projection = GLM_MAT4_IDENTITY_INIT;
 
-		glm_rotate(model, (float)SDL_GetTicks() / 1000, (vec3){0.5f, 1.0f, 0.0f});
 		glm_translate(view, (vec3) {0.0f, 0.0f, -3.0f});
 		glm_perspective(glm_rad(45.0f), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f, projection);
 
-		unsigned int modelLoc = glGetUniformLocation(shaderProgram, "model");
-		unsigned int viewLoc = glGetUniformLocation(shaderProgram, "view");
-
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, model[0]);
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
-
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, &projection[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, &view[0][0]);
 
 		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		for (unsigned int i = 0; i < 10; i++) {
+			mat4 model = GLM_MAT4_IDENTITY_INIT;
+			glm_translate(model, cubePosition[i]);
+			glm_rotate(model, (float)SDL_GetTicks() / 1000, (vec3) { 0.5f, 1.0f, 0.0f });
+			glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, &model[0][0]);
+
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
 
 		SDL_GL_SwapWindow(mainSystems.window);
 	}

@@ -24,7 +24,7 @@ GLuint* fragmentShaderSource =
 "void main()\n"
 "{\n"
 "// linearly interpolate between both textures (80% container, 20% awesomeface)\n"
-"FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.2);\n"
+"FragColor = texture(texture1, TexCoord);\n"
 "}\n\0";
 
 /*

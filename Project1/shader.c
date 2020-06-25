@@ -1,46 +1,56 @@
 #include "shader.h"
 
-GLuint* vertexShaderSource = 
-"#version 330 core\n"
-"layout(location = 0) in vec3 aPos;\n"
-"layout(location = 1) in vec2 aTexCoord;\n"
-"out vec2 TexCoord;\n"
-"uniform mat4 model;\n"
-"uniform mat4 view;\n"
-"uniform mat4 projection;\n"
-"void main()\n"
-"{\n"
-"gl_Position = projection * view * model * vec4(aPos, 1.0f);\n"
-"TexCoord = vec2(aTexCoord.x, aTexCoord.y);\n"
-"}\n\0";
+void shader_errors(GLuint obj, const char* type);
 
-GLuint* fragmentShaderSource =
-"#version 330 core\n"
-"out vec4 FragColor;\n"
-"in vec2 TexCoord;\n"
-"// texture samplers\n"
-"uniform sampler2D texture1;\n"
-"uniform sampler2D texture2;\n"
-"void main()\n"
-"{\n"
-"// linearly interpolate between both textures (80% container, 20% awesomeface)\n"
-"FragColor = texture(texture1, TexCoord);\n"
-"}\n\0";
+/*
+ *  Loading a shader from a file into memory
+ */
+void loading_shader(const GLchar* filepath, GLchar** shaderType) {
+    //Open file for reading
+    FILE* file = fopen(filepath, "rb");
+    fseek(file, 0, SEEK_END);
+    long fileSize = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    *shaderType = malloc(fileSize + 1);
+    if (shaderType == NULL) {
+        printf("ERROR:: Allocation error\n");
+        exit(0);
+    }
+
+    fread(*shaderType, fileSize, 1, file);
+    if (feof(file)) {
+        printf("ERROR:: Unexpected end of file\n");
+        exit(0);
+    }
+
+    fclose(file);
+
+    (*shaderType)[fileSize] = 0;
+}
 
 /*
  *  Compilation of the shader obtained from the file for use in the program
  */
-void compile_shader(GLuint* shaderProgram) {
+void compile_shader(const GLchar* vertexPath, const GLchar* fragmentPath, GLuint* shaderProgram) {
     GLuint vertexShader, fragmentShader;
+    //File
+    GLchar* vertexShaderSource;
+    GLchar* fragmentShaderSource;
+
+    loading_shader(vertexPath, &vertexShaderSource);
+    loading_shader(fragmentPath, &fragmentShaderSource);
 
     //Work with vertex shader
     vertexShader = glCreateShader(GL_VERTEX_SHADER); //Shader type
     glShaderSource(vertexShader, 1, (const GLchar* const*)&vertexShaderSource, NULL); //Bind
     glCompileShader(vertexShader); //Compile
+    shader_errors(vertexShader, "VERTEX");
 
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, (const GLchar* const*)&fragmentShaderSource, NULL);
     glCompileShader(fragmentShader);
+    shader_errors(fragmentShader, "FRAGMENT");
 
     *shaderProgram = glCreateProgram();
 
@@ -48,7 +58,49 @@ void compile_shader(GLuint* shaderProgram) {
     glAttachShader(*shaderProgram, fragmentShader);
     glLinkProgram(*shaderProgram);
 
+    shader_errors(*shaderProgram, "PROGRAM");
+
     //Unload since the shader is already loaded into the program and is not used
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
+}
+
+void shader_errors(GLuint obj, const char* type) {
+    int success;
+    char infoLog[512];
+
+    if (strcmp(type, "VERTEX") == 0) {
+        glGetShaderiv(obj, GL_COMPILE_STATUS, &success);
+        if (!success) {
+            glGetShaderInfoLog(obj, 512, NULL, infoLog);
+            printf("ERROR::SHADER::%s::COMPILATION_FAILED %s\n", type, infoLog);
+        }
+        else {
+            printf("Shader %s loaded\n", type);
+        }
+    }
+    else {
+        if (strcmp(type, "FRAGMENT") == 0) {
+            glGetShaderiv(obj, GL_COMPILE_STATUS, &success);
+            if (!success) {
+                glGetShaderInfoLog(obj, 512, NULL, infoLog);
+                printf("ERROR::SHADER::%s::COMPILATION_FAILED %s\n", type, infoLog);
+            }
+            else {
+                printf("Shader %s loaded\n", type);
+            }
+        }
+        else {
+            if (strcmp(type, "PROGRAM") == 0) {
+                glGetProgramiv(obj, GL_LINK_STATUS, &success);
+                if (!success) {
+                    glGetProgramInfoLog(obj, 512, NULL, infoLog);
+                    printf("ERROR::SHADER::%s::LINKING_FAILED %s\n", type, infoLog);
+                }
+                else {
+                    printf("Program loaded\n");
+                }
+            }
+        }
+    }
 }

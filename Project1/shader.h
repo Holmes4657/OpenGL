@@ -8,6 +8,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-void compile_shader(GLuint* program);
+void compile_shader(const GLchar* vertexPath, const GLchar* fragmentPath, GLuint* program);
 
 #endif // !SHADER_H

@@ -16,6 +16,12 @@ bool quit = false;
 
 GLuint shaderProgram;
 
+void init_opengl() {
+	vec3 cameraPosition = {0.0f, 0.0f, 1.0f};
+	vec3 cameraCenter = { 0.0f, 0.0f, -1.0f };
+	vec3 cameraUp = { 0.0f, 1.0f, 0.0f };
+}
+
 int main(int argc, char* argv[]) {
 
 	printf("Initialization of SDL has begun\n");
@@ -73,7 +79,9 @@ int main(int argc, char* argv[]) {
 
 	glEnable(GL_DEPTH_TEST);
 
-	compile_shader(&shaderProgram);
+	compile_shader("shaders/vertex.txt", "shaders/fragment.txt", &shaderProgram);
+
+	init_opengl();
 
 	float vertices[] = {
 		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,

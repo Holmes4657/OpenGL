@@ -11,10 +11,4 @@ typedef struct {
 	SDL_GLContext* glContext;
 } MainSystems;
 
-struct Vector3D {
-	float x;
-	float y;
-	float z;
-};
-
 #endif // !STRUCTS_H

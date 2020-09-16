@@ -1,5 +1,11 @@
 #include <stdio.h>
-#include <SDL.h>
+
+#ifdef _WIN64
+	#include <SDL.h>
+#elif __linux
+	#include <SDL2/SDL.h>
+#endif
+
 #include "structs.h"
 #include <stdbool.h>
 #include "shader.h"
@@ -9,8 +15,11 @@
 #include "game.h"
 #include "camera.h"
 #include "input.h"
+#include "model.h"
 
-MainSystems mainSystems;
+vec3 vertices;
+vec3 uvs;
+vec3 normals;
 
 int SCREEN_WIDTH = 800;
 int SCREEN_HEIGHT = 600;
@@ -33,9 +42,11 @@ int main(int argc, char* argv[]) {
 	Uint64 NOW = SDL_GetPerformanceCounter();
 	Uint64 LAST = 0;
 
-	if (!gameInit()) {
-		cleanUp();
-	}
+	system("ls");
+
+	gameInit();
+
+	load_obj("simplecube.obj", vertices, uvs, normals);
 
 	compile_shader("shaders/vertex.txt", "shaders/fragment.txt", &shaderProgram);
 
@@ -124,7 +135,8 @@ int main(int argc, char* argv[]) {
 	SDL_Event event;
 
 	while (!quit) {
-		keystate = SDL_GetKeyboardState(NULL);
+		
+		const Uint8* keystate = SDL_GetKeyboardState(NULL);
 		while (SDL_PollEvent(&event) != 0) {
 			switch (event.type) {
 			case SDL_QUIT:
@@ -141,14 +153,14 @@ int main(int argc, char* argv[]) {
 			}
 		}
 
-		keyboard_handling(deltaTime);
+		keyboard_handling(keystate, deltaTime);
 
 		/* Framerate sample */
 		LAST = NOW;
 		NOW = SDL_GetPerformanceCounter();
-		deltaTime = (double)((NOW - LAST) / (double)SDL_GetPerformanceFrequency());
+		deltaTime = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
 
-		glClearColor(1.0, 1.0, 1.0, 1.0);
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glActiveTexture(GL_TEXTURE0);
@@ -166,16 +178,14 @@ int main(int argc, char* argv[]) {
 
 		glBindVertexArray(VAO);
 
-		for (unsigned int i = 0; i < 10; i++) {
-			mat4 model = GLM_MAT4_IDENTITY_INIT;
-			glm_translate(model, cubePosition[i]);
-			//glm_rotate(model, (float)SDL_GetTicks() / 1000, (vec3) { 0.5f, 1.0f, 0.0f });
-			glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, &model[0][0]);
+		mat4 model = GLM_MAT4_IDENTITY_INIT;
+		glm_translate(model, (vec3){0.0f, 0.0f, 0.0f});
+		//glm_rotate(model, (float)SDL_GetTicks() / 1000, (vec3) { 0.5f, 1.0f, 0.0f });
+		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, &model[0][0]);
 
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 
-		SDL_GL_SwapWindow(mainSystems.window);
+		swap_window();
 	}
 
 	glDeleteVertexArrays(1, &VAO);

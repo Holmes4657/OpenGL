@@ -3,14 +3,19 @@
 #ifndef INPUT_H
 #define INPUT_H
 
-#include <SDL.h>
+#ifdef _WIN64
+	#include <SDL.h>
+#elif __linux
+	#include <SDL2/SDL.h>
+#endif
+
 #include "camera.h"
 
 /* Keyboard */
-const Uint8* keystate;
+
 
 /* Input */
-void keyboard_handling(double deltaTime);
+void keyboard_handling(const Uint8* keystate, double deltaTime);
 void mouse_handling(SDL_MouseMotionEvent event);
 void scroll_handling(SDL_MouseWheelEvent event);
 

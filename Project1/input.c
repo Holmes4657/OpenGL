@@ -1,6 +1,7 @@
 #include "input.h"
 
-void keyboard_handling(double deltaTime) {
+void keyboard_handling(const Uint8* keystate, double deltaTime) {
+
 	if (keystate[SDL_SCANCODE_Q]) {
 		SDL_Event quit;
 		quit.type = SDL_QUIT;

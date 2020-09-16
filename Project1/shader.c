@@ -8,6 +8,11 @@ void shader_errors(GLuint obj, const char* type);
 void loading_shader(const GLchar* filepath, GLchar** shaderType) {
     //Open file for reading
     FILE* file = fopen(filepath, "rb");
+    if(file == NULL) {
+        printf("File not found\n");
+        exit(0);
+    }
+
     fseek(file, 0, SEEK_END);
     long fileSize = ftell(file);
     fseek(file, 0, SEEK_SET);
@@ -33,6 +38,7 @@ void loading_shader(const GLchar* filepath, GLchar** shaderType) {
  *  Compilation of the shader obtained from the file for use in the program
  */
 void compile_shader(const GLchar* vertexPath, const GLchar* fragmentPath, GLuint* shaderProgram) {
+
     GLuint vertexShader, fragmentShader;
     //File
     GLchar* vertexShaderSource;

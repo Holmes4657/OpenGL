@@ -2,11 +2,8 @@
 
 void shader_errors(GLuint obj, const char* type);
 
-/*
- *  Loading a shader from a file into memory
- */
 void loading_shader(const GLchar* filepath, GLchar** shaderType) {
-    //Open file for reading
+
     FILE* file = fopen(filepath, "rb");
     if(file == NULL) {
         printf("File not found\n");
@@ -34,22 +31,18 @@ void loading_shader(const GLchar* filepath, GLchar** shaderType) {
     (*shaderType)[fileSize] = 0;
 }
 
-/*
- *  Compilation of the shader obtained from the file for use in the program
- */
 void compile_shader(const GLchar* vertexPath, const GLchar* fragmentPath, GLuint* shaderProgram) {
 
     GLuint vertexShader, fragmentShader;
-    //File
+
     GLchar* vertexShaderSource;
     GLchar* fragmentShaderSource;
 
     loading_shader(vertexPath, &vertexShaderSource);
     loading_shader(fragmentPath, &fragmentShaderSource);
 
-    //Work with vertex shader
-    vertexShader = glCreateShader(GL_VERTEX_SHADER); //Shader type
-    glShaderSource(vertexShader, 1, (const GLchar* const*)&vertexShaderSource, NULL); //Bind
+    vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, (const GLchar* const*)&vertexShaderSource, NULL);
     glCompileShader(vertexShader); //Compile
     shader_errors(vertexShader, "VERTEX");
 
@@ -66,7 +59,6 @@ void compile_shader(const GLchar* vertexPath, const GLchar* fragmentPath, GLuint
 
     shader_errors(*shaderProgram, "PROGRAM");
 
-    //Unload since the shader is already loaded into the program and is not used
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 }

@@ -4,7 +4,6 @@
 #include "stb_image.h"
 
 void loadTexture(const char* filename, GLuint* texture) {
-    //Variables
     int textureWidth, textureHeight, nrChannels;
     unsigned char* data;
 

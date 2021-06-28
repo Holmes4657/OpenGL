@@ -1,5 +1,3 @@
-#pragma once
-
 #ifndef GAME_H
 #define GAME_H
 
@@ -11,8 +9,6 @@
 #elif __linux
 	#include <SDL2/SDL.h>
 #endif
-
-#include "structs.h"
 
 bool gameInit(void);
 void swap_window(void);

@@ -2,7 +2,7 @@
 
 #define MAX_VERTEX	100000
 #define MAX_NORMAL	100000
-#define MAX_UV		  100000
+#define MAX_UV		100000
 
 struct Vertex {
   float x, y, z;

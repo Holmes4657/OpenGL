@@ -21,13 +21,11 @@ float Zoom;
 
 void updateCameraVectors();
 
-float fov_back()
-{
+float fov_back(void) {
 	return Zoom;
 }
 
 void Camera(vec3 position, vec3 up, float yaw, float pitch) {
-	printf("Init camera\n");
 	MovementSpeed = SPEED;
 	MouseSensitivity = SENSITIVITY;
 	Zoom = ZOOM;
@@ -49,29 +47,26 @@ void ProcessKeyboard(enum Camera_Movement direction, float deltaTime) {
 	vec3 velocity_vec = {velocity, velocity, velocity};
 	vec3 t;
 
-	if (direction == FORWARD) {
-		//t = Front * velocity
-		//Position = Position + t
-		glm_vec3_mulv(Front, velocity_vec, t);
-		glm_vec3_add(Position, t, Position);
-	}
-	if (direction == BACKWARD) {
-		//t = Front * velocity
-		//Position = Poisiton - t
-		glm_vec3_mulv(Front, velocity_vec, t);
-		glm_vec3_sub(Position, t, Position);
-	}
-	if (direction == LEFT) {
-		//t = Right * velocity
-		//Position = Position - t
-		glm_vec3_mulv(Right, velocity_vec, t);
-		glm_vec3_sub(Position, t, Position);
-	}
-	if (direction == RIGHT) {
-		//t = Right * velocity
-		//Position = Position + t
-		glm_vec3_mulv(Right, velocity_vec, t);
-		glm_vec3_add(Position, t, Position);
+	switch(direction) {
+	    case FORWARD:
+            glm_vec3_mulv(Front, velocity_vec, t);
+            glm_vec3_add(Position, t, Position);
+	        break;
+
+	    case BACKWARD:
+            glm_vec3_mulv(Front, velocity_vec, t);
+            glm_vec3_sub(Position, t, Position);
+	        break;
+
+	    case LEFT:
+            glm_vec3_mulv(Right, velocity_vec, t);
+            glm_vec3_sub(Position, t, Position);
+	        break;
+
+	    case RIGHT:
+            glm_vec3_mulv(Right, velocity_vec, t);
+            glm_vec3_add(Position, t, Position);
+	        break;
 	}
 }
 

@@ -1,12 +1,7 @@
-#pragma once
-
 #ifndef CAMERA_H
 #define CAMERA_H
 
 #include <cglm/cglm.h>
-#include <cglm/vec3.h>
-#include <cglm/vec3-ext.h>
-#include <cglm/mat4.h>
 #include <GL/glew.h>
 
 typedef enum Camera_Movement {
@@ -19,6 +14,6 @@ void ProcessKeyboard(enum Camera_Movement direction, float deltaTime);
 void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch);
 void ProcessMouseScroll(float yoffset);
 
-float fov_back();
+float fov_back(void);
 
 #endif // !CAMERA_H
